@@ -1,107 +1,25 @@
 <!doctype html>
 <html lang="th">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#090d12">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Pocket Ledger">
-  <meta name="description" content="บันทึกรายรับรายจ่ายหลายสกุลเงิน พร้อมกำหนดอัตราแลกเปลี่ยนเอง">
-  <link rel="manifest" href="manifest.webmanifest">
-  <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <link rel="icon" href="icons/icon-192.png">
-  <link rel="stylesheet" href="styles.css">
-  <title>Pocket Ledger</title>
-</head>
-<body>
-  <header class="topbar">
-    <div><div class="eyebrow">PERSONAL FINANCE</div><h1>Pocket Ledger</h1></div>
-    <button id="quickAdd" class="icon-button" aria-label="เพิ่มรายการ">＋</button>
-  </header>
-
-  <main>
-    <section class="hero panel">
-      <div class="muted">ยอดคงเหลือรวม · มูลค่าเงินบาท</div>
-      <div id="totalBalance" class="total">฿0.00</div>
-      <div class="summary-row">
-        <div><span class="dot income"></span><span class="muted">รายรับ</span><strong id="incomeTotal">฿0.00</strong></div>
-        <div><span class="dot expense"></span><span class="muted">รายจ่าย</span><strong id="expenseTotal">฿0.00</strong></div>
-      </div>
-    </section>
-
-    <nav class="tabs" aria-label="เมนูหลัก">
-      <button class="tab active" data-tab="overview">ภาพรวม</button>
-      <button class="tab" data-tab="transactions">รายการ</button>
-      <button class="tab" data-tab="currencies">สกุลเงิน</button>
-      <button class="tab" data-tab="settings">สำรองข้อมูล</button>
-    </nav>
-
-    <section id="overviewPage" class="page">
-      <div class="section-heading"><h2>ยอดแยกตามสกุลเงิน</h2><span class="muted small">แปลงเป็น THB</span></div>
-      <div id="currencyBalances" class="stack"></div>
-      <div class="section-heading recent-heading"><h2>รายการล่าสุด</h2><button class="text-button" data-goto="transactions">ดูทั้งหมด</button></div>
-      <div id="recentTransactions" class="stack"></div>
-    </section>
-
-    <section id="transactionsPage" class="page hidden">
-      <div class="section-heading"><h2>รายการทั้งหมด</h2><span id="transactionCount" class="muted small">0 รายการ</span></div>
-      <div id="allTransactions" class="stack"></div>
-    </section>
-
-    <section id="currenciesPage" class="page hidden">
-      <div class="section-heading"><h2>สกุลเงินและอัตราแลกเปลี่ยน</h2><button id="addCurrency" class="text-button">＋ เพิ่ม</button></div>
-      <p class="helper">กำหนดว่า 1 หน่วยของสกุลเงินนั้นมีค่าเท่ากับกี่บาท เช่น 1 USD = 35 THB</p>
-      <div id="currencySettings" class="stack"></div>
-    </section>
-
-    <section id="settingsPage" class="page hidden">
-      <div class="panel settings-card">
-        <h2>ข้อมูลของคุณอยู่ในเครื่อง</h2>
-        <p class="muted">Pocket Ledger เก็บข้อมูลไว้ในพื้นที่จัดเก็บของเบราว์เซอร์บน iPhone ไม่มีบัญชีผู้ใช้และไม่มีการส่งข้อมูลไปยังเซิร์ฟเวอร์</p>
-        <button id="exportBackup" class="primary wide">ดาวน์โหลดไฟล์สำรองข้อมูล JSON</button>
-        <label class="secondary wide file-label">นำเข้าไฟล์สำรองข้อมูล<input id="importBackup" type="file" accept="application/json,.json"></label>
-        <button id="exportCSV" class="secondary wide">ส่งออกรายการเป็น CSV</button>
-        <div class="warning">สำคัญ: อย่าล้างข้อมูลเว็บไซต์หรือถอนเว็บแอปก่อนสำรองข้อมูล เก็บไฟล์สำรองไว้ใน Files หรือ iCloud Drive ด้วยตนเอง</div>
-      </div>
-      <div class="panel settings-card">
-        <h2>เกี่ยวกับการคำนวณ</h2>
-        <p class="muted">สกุลเงินหลักคือ THB อัตราแลกเปลี่ยนที่ใช้ตอนบันทึกรายการจะถูกเก็บเป็น snapshot ดังนั้นการแก้เรทปัจจุบันจะไม่เปลี่ยนมูลค่ารายการเก่า</p>
-        <p class="muted small">แอปทำงานออฟไลน์ได้หลังจากเปิดผ่านเว็บไซต์และโหลดไฟล์ครบอย่างน้อยหนึ่งครั้ง</p>
-      </div>
-    </section>
-  </main>
-
-  <button id="floatingAdd" class="fab" aria-label="เพิ่มรายการ">＋</button>
-
-  <dialog id="transactionDialog">
-    <form id="transactionForm" method="dialog">
-      <div class="dialog-header"><h2 id="transactionTitle">เพิ่มรายการ</h2><button type="button" class="close" data-close="transactionDialog">×</button></div>
-      <div class="segmented">
-        <button type="button" class="segment selected" data-kind="expense">รายจ่าย</button>
-        <button type="button" class="segment" data-kind="income">รายรับ</button>
-      </div>
-      <label>จำนวนเงิน<input id="amount" type="number" min="0.000001" step="any" inputmode="decimal" placeholder="0.00" required></label>
-      <label>สกุลเงิน<select id="transactionCurrency"></select></label>
-      <div id="ratePreview" class="rate-preview"></div>
-      <label>หมวดหมู่<input id="category" maxlength="40" value="ทั่วไป" placeholder="เช่น อาหาร เงินเดือน"></label>
-      <label>หมายเหตุ<input id="note" maxlength="120" placeholder="ไม่บังคับ"></label>
-      <label>วันที่และเวลา<input id="date" type="datetime-local" required></label>
-      <div class="dialog-actions"><button type="button" class="secondary" data-close="transactionDialog">ยกเลิก</button><button type="submit" class="primary">บันทึก</button></div>
-    </form>
-  </dialog>
-
-  <dialog id="currencyDialog">
-    <form id="currencyForm" method="dialog">
-      <div class="dialog-header"><h2>เพิ่มสกุลเงิน</h2><button type="button" class="close" data-close="currencyDialog">×</button></div>
-      <label>รหัสสกุลเงิน 3 ตัว<input id="newCode" maxlength="3" autocapitalize="characters" placeholder="เช่น SGD" required></label>
-      <label>ชื่อสกุลเงิน<input id="newName" maxlength="50" placeholder="Singapore Dollar" required></label>
-      <label>เรทต่อ 1 หน่วย (THB)<input id="newRate" type="number" min="0.000001" step="any" inputmode="decimal" placeholder="เช่น 26" required></label>
-      <div class="dialog-actions"><button type="button" class="secondary" data-close="currencyDialog">ยกเลิก</button><button type="submit" class="primary">เพิ่มสกุลเงิน</button></div>
-    </form>
-  </dialog>
-
-  <div id="toast" role="status" aria-live="polite"></div>
-  <script src="app.js"></script>
-</body>
-</html>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#090d12"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Pocket Ledger">
+<link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icons/icon-192.png"><link rel="stylesheet" href="styles.css"><title>Pocket Ledger</title>
+</head><body>
+<header class="topbar"><div><div class="eyebrow">PERSONAL FINANCE</div><h1>Pocket Ledger</h1></div><button id="quickAdd" class="icon-button">＋</button></header>
+<main>
+<section class="hero panel"><div class="muted">ทรัพย์สินรวม · แปลงเป็น THB</div><div id="totalBalance" class="total">฿0.00</div><div class="summary-row"><div><span class="dot income"></span><span class="muted">รายรับ</span><strong id="incomeTotal">฿0.00</strong></div><div><span class="dot expense"></span><span class="muted">รายจ่าย</span><strong id="expenseTotal">฿0.00</strong></div></div></section>
+<nav class="tabs"><button class="tab active" data-tab="overview">ภาพรวม</button><button class="tab" data-tab="transactions">ประวัติ</button><button class="tab" data-tab="wallets">กระเป๋า</button><button class="tab" data-tab="currencies">สกุลเงิน</button><button class="tab" data-tab="settings">สำรอง</button></nav>
+<section id="overviewPage" class="page"><div class="section-heading"><h2>ยอดคงเหลือแยกตามสกุลเงิน</h2></div><div id="currencyBalances" class="stack"></div><div class="section-heading"><h2>กระเป๋าเงิน</h2><button class="text-button" data-goto="wallets">จัดการ</button></div><div id="walletOverview" class="stack"></div><div class="section-heading"><h2>รายการล่าสุด</h2><button class="text-button" data-goto="transactions">ดูทั้งหมด</button></div><div id="recentTransactions" class="stack"></div></section>
+<section id="transactionsPage" class="page hidden"><div class="section-heading"><h2>ประวัติรายการ</h2><span id="transactionCount" class="muted small"></span></div><input id="searchTransactions" class="search" placeholder="ค้นหาหมวดหมู่ หมายเหตุ กระเป๋า หรือสกุลเงิน"><div id="allTransactions" class="stack"></div></section>
+<section id="walletsPage" class="page hidden"><div class="section-heading"><h2>กระเป๋าเงิน</h2><button id="addWallet" class="text-button">＋ เพิ่มกระเป๋า</button></div><p class="helper">เช่น เงินสด บัญชีธนาคาร หรือเงินสดต่างประเทศ ยอดเงินจะคำนวณจากรายการในแต่ละกระเป๋า</p><div id="walletList" class="stack"></div></section>
+<section id="currenciesPage" class="page hidden"><div class="section-heading"><h2>สกุลเงินและเรทซื้อ-ขาย</h2><button id="addCurrency" class="text-button">＋ เพิ่ม</button></div><p class="helper">เรทเป็น THB ต่อ 1 หน่วยเงินตรา: เรทซื้อ = แอป/ร้านรับซื้อเงินสกุลนั้น, เรทขาย = แอป/ร้านขายเงินสกุลนั้น</p><div id="currencySettings" class="stack"></div></section>
+<section id="settingsPage" class="page hidden"><div class="panel settings-card"><h2>ข้อมูลเก็บใน iPhone</h2><p class="muted">ไม่มีการซิงก์หรือส่งข้อมูลขึ้นเซิร์ฟเวอร์ กรุณาสำรองข้อมูลด้วยตนเองสม่ำเสมอ</p><button id="exportBackup" class="primary wide">ดาวน์โหลดไฟล์สำรอง JSON</button><label class="secondary wide file-label">นำเข้าไฟล์สำรอง<input id="importBackup" type="file" accept="application/json,.json"></label><button id="exportCSV" class="secondary wide">ส่งออก CSV</button><div class="warning">หากล้างข้อมูลเว็บไซต์ ข้อมูลอาจสูญหาย ต้องสำรอง JSON ไว้ใน Files เป็นประจำ</div></div></section>
+</main><button id="floatingAdd" class="fab">＋</button>
+<dialog id="transactionDialog"><form id="transactionForm" method="dialog"><div class="dialog-header"><h2 id="transactionTitle">เพิ่มรายการ</h2><button type="button" class="close" data-close="transactionDialog">×</button></div>
+<div class="segmented"><button type="button" class="segment selected" data-kind="expense">รายจ่าย</button><button type="button" class="segment" data-kind="income">รายรับ</button><button type="button" class="segment" data-kind="transfer">โอน/แลกเงิน</button></div>
+<div id="normalFields"><label>จำนวนเงิน<input id="amount" type="number" min="0.000001" step="any" required></label><label>กระเป๋า<select id="wallet"></select></label><label>สกุลเงิน<select id="currency"></select></label><div id="ratePreview" class="rate-preview"></div><label>หมวดหมู่<input id="category" value="ทั่วไป" maxlength="40"></label></div>
+<div id="transferFields" class="hidden"><label>กระเป๋าต้นทาง<select id="fromWallet"></select></label><label>จำนวนเงินที่จ่าย<input id="fromAmount" type="number" min="0.000001" step="any"></label><label>สกุลเงินต้นทาง<select id="fromCurrency"></select></label><label>กระเป๋าปลายทาง<select id="toWallet"></select></label><label>จำนวนเงินที่ได้รับ<input id="toAmount" type="number" min="0.000001" step="any"></label><label>สกุลเงินปลายทาง<select id="toCurrency"></select></label><div class="helper">กรอกจำนวนที่จ่ายและจำนวนที่ได้รับตามใบแลกเงินจริง ระบบจะบันทึกเรทจริงจากตัวเลขทั้งสองฝั่ง</div><div id="exchangePreview" class="rate-preview"></div></div>
+<label>หมายเหตุ<input id="note" maxlength="120"></label><label>วันที่และเวลา<input id="date" type="datetime-local" required></label><div class="dialog-actions"><button type="button" class="secondary" data-close="transactionDialog">ยกเลิก</button><button type="submit" class="primary">บันทึก</button></div></form></dialog>
+<dialog id="currencyDialog"><form id="currencyForm" method="dialog"><div class="dialog-header"><h2>เพิ่มสกุลเงิน</h2><button type="button" class="close" data-close="currencyDialog">×</button></div><label>รหัสสกุลเงิน<input id="newCode" maxlength="3" placeholder="SGD" required></label><label>ชื่อสกุลเงิน<input id="newName" maxlength="50" required></label><label>เรทซื้อ (THB ต่อ 1 หน่วย)<input id="newBuy" type="number" min="0.000001" step="any" required></label><label>เรทขาย (THB ต่อ 1 หน่วย)<input id="newSell" type="number" min="0.000001" step="any" required></label><div class="dialog-actions"><button type="button" class="secondary" data-close="currencyDialog">ยกเลิก</button><button class="primary">เพิ่มสกุลเงิน</button></div></form></dialog>
+<dialog id="walletDialog"><form id="walletForm" method="dialog"><div class="dialog-header"><h2>เพิ่มกระเป๋าเงิน</h2><button type="button" class="close" data-close="walletDialog">×</button></div><label>ชื่อกระเป๋า<input id="walletName" placeholder="เช่น เงินสด, ธนาคาร..." required></label><label>ประเภท<select id="walletType"><option>เงินสด</option><option>บัญชีธนาคาร</option><option>เงินสดต่างประเทศ</option><option>อื่นๆ</option></select></label><label>สกุลเงิน<select id="walletCurrency"></select></label><div class="dialog-actions"><button type="button" class="secondary" data-close="walletDialog">ยกเลิก</button><button class="primary">เพิ่มกระเป๋า</button></div></form></dialog>
+<div id="toast" role="status" aria-live="polite"></div><script src="app.js"></script></body></html>
